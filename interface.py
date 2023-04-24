@@ -1,36 +1,37 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from AppTest import *
 
-st.title('Uber pickups in NYC')
+st.title('ViewIt Chatbot')
 
 DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
 
-@st.cache_data
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+# @st.cache_data
+# def load_data():
+#     data = pd.read_json(DATA_URL)
+#     lowercase = lambda x: str(x).lower()
+#     data.rename(lowercase, axis='columns', inplace=True)
+#     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+#     return data
 
-data_load_state = st.text('Loading data...')
-data = load_data(10000)
-data_load_state.text("Done! (using st.cache_data)")
+# data_load_state = st.text('Loading data...')
+# data = load_data(10000)
+# data_load_state.text("Done! (using st.cache_data)")
 
-if st.checkbox('Show raw data'):
-    st.subheader('Raw data')
-    st.write(data)
+chat_hist = pd.DataFrame({
+    
+})
 
-st.subheader('Number of pickups by hour')
-hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
-st.bar_chart(hist_values)
+def answerMe(vector_index):
+    v_index = GPTSimpleVectorIndex.load_from_disk(vector_index)
+    while True:
+        prompt = st.text_input(label='Ask a question', value="Properties in Marina Dubai")
+        response = v_index.query(prompt, response_mode='compact')
+        print(f'Response: {response} \n')
 
-# Some number in the range 0-23
-hour_to_filter = st.slider('hour', 0, 23, 17)
-filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
 
-st.subheader('Map of all pickups at %s:00' % hour_to_filter)
-st.map(filtered_data)
+if st.checkbox('Show chat history'):
+    st.subheader('Chat history')
+    st.write(chat_hist)
+
