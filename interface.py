@@ -1,36 +1,56 @@
+from streamlit_chat import message
 import streamlit as st
 import pandas as pd
 import numpy as np
+import openai
 
-st.title('Uber pickups in NYC')
+openai.api_key = st.secrets["api_secret"]
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+def generate_response(prompt):
+    completions = openai.Completion.create(
+        engine = 'text-davinci-003',
+        prompt = prompt,
+        max_tokens = 512,
+        n = 1,
+        stop = None,
+        temperature = .5
+    )
+    message = completions.choices[0].text
+    return message
 
-@st.cache_data
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+st.title('ViewIt Chatbot')
 
-data_load_state = st.text('Loading data...')
-data = load_data(10000)
-data_load_state.text("Done! (using st.cache_data)")
+with st.sidebar:
+    st.markdown("""
+                # About
+                This Chatbot Assistant will help you look for your desired properties
 
-if st.checkbox('Show raw data'):
-    st.subheader('Raw data')
-    st.write(data)
+                # How does it work
+                Simply enter your query in the text field and the assistant will help you out.
+                """)
 
-st.subheader('Number of pickups by hour')
-hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
-st.bar_chart(hist_values)
+# storing chat history
+if 'generated' not in st.session_state:
+    st.session_state['generated'] = []
 
-# Some number in the range 0-23
-hour_to_filter = st.slider('hour', 0, 23, 17)
-filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
+if 'past' not in st.session_state:
+    st.session_state['past'] = []
 
-st.subheader('Map of all pickups at %s:00' % hour_to_filter)
-st.map(filtered_data)
+def get_text():
+    input_text = st.text_input("Ask a question: ", key='input', 
+                               placeholder='Any 2 bedroom apartments available in Dubai Marina?')
+    return input_text
+
+user_input = get_text()
+
+if user_input:
+    output = generate_response(user_input)
+    
+    #store chat
+    st.session_state.past.append(user_input)
+    st.session_state.generated.append(output)
+
+if st.session_state['generated']:
+    for i in range(len(st.session_state['generated'])-1, -1):
+        message(st.session_state['past'][i], is_user=True, key=str(i)+'_user')
+        message(st.session_state['generated'][i], key=str(i))
