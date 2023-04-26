@@ -1,25 +1,33 @@
+# need to create new vector index with a better model than ada (curie or davinci)
+# and try the app with that model
+
+# should i integrate all the code in one file?
+# or should i keep components separate?
+# like: > creating vector index
+#       > streamlit interface
+
+# try both
+
+
+from gpt_index import GPTSimpleVectorIndex
 from streamlit_chat import message
 import streamlit as st
-import pandas as pd
-import numpy as np
-import openai
+import os
 
-openai.api_key = st.secrets["api_secret"]
+# viewit api key
+os.environ["OPENAI_API_KEY"] = "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"
 
-def generate_response(prompt):
-    completions = openai.Completion.create(
-        engine = 'text-curie-001',
-        prompt = prompt,
-        max_tokens = 512,
-        n = 1,
-        stop = None,
-        temperature = .5
-    )
-    message = completions.choices[0].text
-    return message
+v_index = GPTSimpleVectorIndex.load_from_disk('vectorIndex.json')
 
+
+def gen_response(prompt):
+    response = v_index.query(prompt, response_mode='compact')
+    return response
+
+# App Title
 st.title('ViewIt Chatbot')
 
+# App Sidebar
 with st.sidebar:
     st.markdown("""
                 # About
@@ -36,17 +44,19 @@ if 'generated' not in st.session_state:
 if 'past' not in st.session_state:
     st.session_state['past'] = []
 
+
 def get_text():
-    input_text = st.text_input("Ask a question: ", key='input', value="Hi, how are you?",
+    input_text = st.text_input("Ask a question: ", key='input', value="Hi",
                                placeholder='Any 2 bedroom apartments available in Dubai Marina?')
     return input_text
+
 
 user_input = get_text()
 
 if user_input:
-    output = generate_response(user_input)
-    
-    #store chat
+    output = str(gen_response(user_input))[2:]
+
+    # store chat
     st.session_state.past.append(user_input)
     st.session_state.generated.append(output)
 
