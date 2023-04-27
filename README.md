@@ -15,8 +15,7 @@ This is a simple prototype of the AI assistant chatbot for ViewIt.
 This Chatbot Assistant will help you look for your desired properties.
 Simply enter your query in the text field and the assistant will help you out.
 
-***
-## Prerequisites
+
 To run the app, navigate to the directory of the app and run it by executing this command in the terminal:
 
     streamlit run interface.py
