@@ -1,12 +1,5 @@
-# need to create new vector index with a better model than ada (curie or davinci)
+# need to create new vector index with a knowldge json without index
 # and try the app with that model
-
-# should i integrate all the code in one file?
-# or should i keep components separate?
-# like: > creating vector index
-#       > streamlit interface
-
-# try both
 
 
 from gpt_index import GPTSimpleVectorIndex
@@ -17,12 +10,23 @@ import os
 # viewit api key
 os.environ["OPENAI_API_KEY"] = "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"
 
-v_index = GPTSimpleVectorIndex.load_from_disk('vectorIndex.json')
-
+# Load vector index for context
+def load_vector_index(v_index):
+    vector_index = GPTSimpleVectorIndex.load_from_disk(f'VectorIndices/{v_index}')
+    return vector_index
 
 def gen_response(prompt):
+    """
+    Returns the AI response based on the context vector index
+    """
     response = v_index.query(prompt, response_mode='compact')
     return response
+
+
+def get_text():
+    input_text = st.text_input("Ask a question: ", key='input', value="Hi",
+                               placeholder='Any 2 bedroom apartments available in Dubai Marina?')
+    return input_text
 
 
 # App Title
@@ -32,7 +36,7 @@ st.title('ViewIt Chatbot')
 with st.sidebar:
     st.markdown("""
                 # About
-                This Chatbot Assistant will help you look for your desired properties
+                This Chatbot Assistant will help you look for your desired properties/
 
                 # How does it work
                 Simply enter your query in the text field and the assistant will help you out.
@@ -45,12 +49,8 @@ if 'generated' not in st.session_state:
 if 'past' not in st.session_state:
     st.session_state['past'] = []
 
-
-def get_text():
-    input_text = st.text_input("Ask a question: ", key='input', value="Hi",
-                               placeholder='Any 2 bedroom apartments available in Dubai Marina?')
-    return input_text
-
+# Load Vector Index For Context
+v_index = load_vector_index('vectorIndex-curie-001.json')
 
 user_input = get_text()
 

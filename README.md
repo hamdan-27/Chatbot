@@ -2,11 +2,7 @@
 
 _Notes:_
 
-* create new vector index with a better model than ada (curie or davinci) and try the app with that model
-* try integrating all the code in one script as well as
-* keeping components separate, like:
-    * creating vector index
-    * streamlit interface
+* Try if QA approach is possible to integrate in this project
 
 ***
 This is a simple prototype of the AI assistant chatbot for ViewIt.
