@@ -54,6 +54,7 @@ v_index = load_vector_index('vectorIndex-curie-001.json')
 
 user_input = get_text()
 
+# Generate a response if input exists
 if user_input:
     output = str(gen_response(user_input))[2:]
 
