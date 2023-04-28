@@ -24,6 +24,7 @@ def gen_response(prompt):
     response = v_index.query(prompt, response_mode='compact')
     return response
 
+
 # App Title
 st.title('ViewIt Chatbot')
 
