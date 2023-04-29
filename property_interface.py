@@ -12,7 +12,7 @@ os.environ["OPENAI_API_KEY"] = "sk-fE1qjzN6WdXj3lMrzQP2T3BlbkFJmTtfUVcFP63pis5cS
 
 # Load vector index for context
 def load_vector_index(v_index):
-    vector_index = GPTSimpleVectorIndex.load_from_disk(f'VectorIndices/{v_index}')
+    vector_index = GPTSimpleVectorIndex.load_from_disk(v_index)
     return vector_index
 
 def gen_response(prompt):
@@ -49,8 +49,8 @@ if 'generated' not in st.session_state:
 if 'past' not in st.session_state:
     st.session_state['past'] = []
 
-# Load Vector Index For Context
-v_index = load_vector_index('vectorIndex-curie-001.json')
+# Load Vector Index For Context (you can choose between ada and curie models)
+v_index = load_vector_index('VectorIndices/vectorIndex-curie-001.json')
 
 user_input = get_text()
 
