@@ -3,12 +3,13 @@
 
 
 from gpt_index import GPTSimpleVectorIndex
+from creds import api_key
 from streamlit_chat import message
 import streamlit as st
 import os
 
 # viewit api key
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = api_key
 
 # Load vector index for context
 def load_vector_index(v_index):
@@ -36,7 +37,7 @@ st.title('ViewIt Chatbot')
 with st.sidebar:
     st.markdown("""
                 # About
-                This Chatbot Assistant will help you look for your desired properties/
+                This Chatbot Assistant will help you look for your desired properties.
 
                 # How does it work
                 Simply enter your query in the text field and the assistant will help you out.
